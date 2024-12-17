@@ -4,7 +4,8 @@ library(lme4)
 library(ggplot2)
 library(dplyr)
 
-setwd("C:/Users/magda/rstudio/emoji")
+# setwd("C:/Users/magda/rstudio/emoji")
+setwd("/media/magda/9C33-6BBD/emojis")
 
 #Importing the critical dataset + bio (change filepath to your own)
 Emoj_EN <- read.csv("Emoji_Eng.csv", header=TRUE, sep=",")
@@ -24,6 +25,8 @@ Emoj_EN$Answer <-as.factor(Emoj_EN$Answer)
 Emoj_EN$Gender <-as.factor(Emoj_EN$Gender)
 Emoj_EN$Use <-as.factor(Emoj_EN$Use)
 Emoj_EN$Rec <-as.factor(Emoj_EN$Rec)
+Emoj_EN$iOS <-as.factor(Emoj_EN$iOS)
+Emoj_EN$Age <-as.factor(Emoj_EN$Age)
 
 #Look at summary of dataset to make sure everything worked.
 summary(Emoj_EN)
@@ -133,12 +136,26 @@ Emoj_EN$Object = ifelse(Emoj_EN$Answer == "Object", 1, 0)
 Emoj_EN$Subject = ifelse(Emoj_EN$Answer == "Subject", 1, 0)
 Emoj_EN$Sender = ifelse(Emoj_EN$Answer == "Sender", 1, 0)
 
-
 #This model assesses the selection of Object (second character) across conditions
 #What we find is that Pos_initial is the least favorable condition to choose Object
 #Then followed by Neg_initial (which is on the verge of significance)
-Obj_model <- glmer(Object ~ Condition + (1 | ID) + (1 | Item_Num), data = Emoj_EN,  family = binomial)
+Obj_model <- glmer(Object ~ Condition + (1 | ID) + (1 | Item_Num), 
+                   data = Emoj_EN,  
+                   family = binomial,
+                   control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
 summary(Obj_model)
+# originally there were two warnings:
+# Warning messages:
+# 1: In checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv,  :
+#    Model failed to converge with max|grad| = 0.0772687 (tol = 0.002, component 1)
+# 2: In checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv,  :
+#    Model is nearly unidentifiable: very large eigenvalue
+#   - Rescale variables?
+
+# they disappeared after I added
+# control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
+# to the function call
+# source: https://stats.stackexchange.com/questions/164457/r-glmer-warnings-model-fails-to-converge-model-is-nearly-unidentifiable
 
 #This model assesses the selection of Subject (first character) across conditions
 #This time - Pos_initial is the most favorable condition to choose Subject 
