@@ -1,7 +1,11 @@
 #Install necessary packages
 install.packages("dplyr","lme4","glmer","ggplot2","tidyr","languageR","sciplot","stats","plyr","lattice","lmerTest","car","ordinal")
+library(lme4)
+library(ggplot2)
+library(dplyr)
 
-setwd("C:/Users/magda/rstudio/emoji")
+setwd("C:/Users/magda/moje/LTE/psycholinguistics/emoji_analysis")
+# setwd("/media/magda/9C33-6BBD/emojis")
 
 #Importing the critical dataset + bio (change filepath to your own)
 Emoj_Pol <- read.csv("Emoji_Pol.csv", header=TRUE, sep=",")
@@ -21,6 +25,8 @@ Emoj_Pol$Answer <-as.factor(Emoj_Pol$Answer)
 Emoj_Pol$Gender <-as.factor(Emoj_Pol$Gender)
 Emoj_Pol$Use <-as.factor(Emoj_Pol$Use)
 Emoj_Pol$Rec <-as.factor(Emoj_Pol$Rec)
+Emoj_Pol$iOS <-as.factor(Emoj_Pol$iOS)
+Emoj_Pol$Age <-as.factor(Emoj_Pol$Age)
 
 #Look at summary of dataset to make sure everything worked.
 summary(Emoj_Pol)
@@ -135,7 +141,10 @@ summary(Obj_modelP)
 #This model assesses the selection of Subject (first character) across conditions
 #Just like English - Pos_initial (Highly significant***) is the most favorable condition to choose Subject 
 #However, both Neg_Initial and Pos_Final are signicantly more favored than Neg_Final
-Subj_modelP <- glmer(Subject ~ Condition + (1 | ID) + (1 | Item_Num), data = Emoj_Pol,  family = binomial)
+Subj_modelP <- glmer(Subject ~ Condition + (1 | ID) + (1 | Item_Num), 
+                     data = Emoj_Pol,  
+                     family = binomial,
+                     control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
 summary(Subj_modelP)
 
 #This model assesses the selection of Sender (sender of text) across conditions
@@ -145,3 +154,11 @@ summary(Subj_modelP)
 Send_modelP <- glmer(Sender ~ Condition + (1 | ID) + (1 | Item_Num), data = Emoj_Pol,  family = binomial)
 summary(Send_modelP)
 
+summary(glmer(Sender ~ Condition + 
+                (1 | ID) + 
+                (1 | Item_Num) + 
+                (1 | Rec) + 
+                (1 | iOS)
+              , data = Emoj_Pol
+              , family = binomial
+              , control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))))

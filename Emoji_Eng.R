@@ -4,12 +4,16 @@ library(lme4)
 library(ggplot2)
 library(dplyr)
 
-# setwd("C:/Users/magda/rstudio/emoji")
-setwd("/media/magda/9C33-6BBD/emojis")
+setwd("C:/Users/magda/moje/LTE/psycholinguistics/emoji_analysis")
+# setwd("/media/magda/9C33-6BBD/emojis")
 
 #Importing the critical dataset + bio (change filepath to your own)
 Emoj_EN <- read.csv("Emoji_Eng.csv", header=TRUE, sep=",")
 Emoj_Bio <- read.csv("Emoji_Eng_Bio.csv", header=TRUE, sep=",")
+
+# older versions:
+Emoj_EN <- read.csv("old_Emoji_Eng.csv", header=TRUE, sep=",")
+Emoj_Bio <- read.csv("old_Emoji_Eng_Bio.csv", header=TRUE, sep=",")
 
 #Combine Datasets
 Emoj_EN <- left_join(Emoj_EN, Emoj_Bio, by = "ID")
@@ -30,6 +34,10 @@ Emoj_EN$Age <-as.factor(Emoj_EN$Age)
 
 #Look at summary of dataset to make sure everything worked.
 summary(Emoj_EN)
+
+#MINE
+# removing fillers?
+Emoj_EN %>% filter(Condition != "Filler") -> Emoj_EN
 
 #See the total number of answers given per condition
 table(Emoj_EN$Condition, Emoj_EN$Answer)
@@ -139,23 +147,8 @@ Emoj_EN$Sender = ifelse(Emoj_EN$Answer == "Sender", 1, 0)
 #This model assesses the selection of Object (second character) across conditions
 #What we find is that Pos_initial is the least favorable condition to choose Object
 #Then followed by Neg_initial (which is on the verge of significance)
-Obj_model <- glmer(Object ~ Condition + (1 | ID) + (1 | Item_Num), 
-                   data = Emoj_EN,  
-                   family = binomial,
-                   control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+Obj_model <- glmer(Object ~ Condition + (1 | ID) + (1 | Item_Num), data = Emoj_EN,family = binomial)
 summary(Obj_model)
-# originally there were two warnings:
-# Warning messages:
-# 1: In checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv,  :
-#    Model failed to converge with max|grad| = 0.0772687 (tol = 0.002, component 1)
-# 2: In checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv,  :
-#    Model is nearly unidentifiable: very large eigenvalue
-#   - Rescale variables?
-
-# they disappeared after I added
-# control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
-# to the function call
-# source: https://stats.stackexchange.com/questions/164457/r-glmer-warnings-model-fails-to-converge-model-is-nearly-unidentifiable
 
 #This model assesses the selection of Subject (first character) across conditions
 #This time - Pos_initial is the most favorable condition to choose Subject 
@@ -168,3 +161,10 @@ summary(Subj_model)
 Send_model <- glmer(Sender ~ Condition + (1 | ID) + (1 | Item_Num), data = Emoj_EN,  family = binomial)
 summary(Send_model)
 
+# I'm just playing around here
+summary(glmer(Sender ~ Condition + 
+                (1 | ID) +
+                (1 | iOS) +
+                (1 | Age), 
+              data = Emoj_EN,  family = binomial,
+              control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))))
