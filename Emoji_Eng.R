@@ -12,11 +12,15 @@ Emoj_EN <- read.csv("Emoji_Eng.csv", header=TRUE, sep=",")
 Emoj_Bio <- read.csv("Emoji_Eng_Bio.csv", header=TRUE, sep=",")
 
 # older versions:
-Emoj_EN <- read.csv("old_Emoji_Eng.csv", header=TRUE, sep=",")
-Emoj_Bio <- read.csv("old_Emoji_Eng_Bio.csv", header=TRUE, sep=",")
+# Emoj_EN <- read.csv("old_Emoji_Eng.csv", header=TRUE, sep=",")
+# Emoj_Bio <- read.csv("old_Emoji_Eng_Bio.csv", header=TRUE, sep=",")
 
 #Combine Datasets
 Emoj_EN <- left_join(Emoj_EN, Emoj_Bio, by = "ID")
+
+#MINE
+# removing fillers
+Emoj_EN %>% filter(Condition != "Filler") -> Emoj_EN
 
 #See what the top 5 rows of your dataset look like
 head(Emoj_EN)
@@ -34,10 +38,6 @@ Emoj_EN$Age <-as.factor(Emoj_EN$Age)
 
 #Look at summary of dataset to make sure everything worked.
 summary(Emoj_EN)
-
-#MINE
-# removing fillers?
-Emoj_EN %>% filter(Condition != "Filler") -> Emoj_EN
 
 #See the total number of answers given per condition
 table(Emoj_EN$Condition, Emoj_EN$Answer)
@@ -60,6 +60,7 @@ Neg_Final = subset(Emoj_EN, Emoj_EN$Condition %in% c("Neg_Final"))
 
 
 #Plot your data - proportions of answers given per condition
+png("C:/Users/magda/moje/LTE/psycholinguistics/emoji_analysis/plots/eng_distribution.png", width=700)
 ggplot(Emoj_EN, aes(x = Condition, fill = Answer)) +
   geom_bar(position = "fill", color = "black") +
   scale_y_continuous(labels = scales::percent) +  # Convert y-axis to percentages
@@ -70,9 +71,11 @@ ggplot(Emoj_EN, aes(x = Condition, fill = Answer)) +
     title = "Proportional Distribution of Answers by Condition"
   ) +
   theme_minimal()
+dev.off()
 
 
 #Pos_Initial Graph of Choices
+png("C:/Users/magda/moje/LTE/psycholinguistics/emoji_analysis/plots/eng_pos_initial.png", width=700)
 ggplot(Pos_Initial, aes(x = Condition, fill = as.factor(Answer))) +
   geom_bar(position = "dodge", color = "black", width = 0.6) +
   scale_fill_manual(values = c("Subject" = "red", "Object" = "skyblue", "Sender" = "green")) +
@@ -87,8 +90,10 @@ ggplot(Pos_Initial, aes(x = Condition, fill = as.factor(Answer))) +
     axis.text.x = element_text(angle = 45, hjust = 1),
     plot.title = element_text(hjust = 0.5)
   )
+dev.off()
 
 #Neg_Initial Graph of Choices
+png("C:/Users/magda/moje/LTE/psycholinguistics/emoji_analysis/plots/eng_neg_initial.png", width=700)
 ggplot(Neg_Initial, aes(x = Condition, fill = as.factor(Answer))) +
   geom_bar(position = "dodge", color = "black", width = 0.6) +
   scale_fill_manual(values = c("Subject" = "red", "Object" = "skyblue", "Sender" = "green")) +
@@ -103,8 +108,10 @@ ggplot(Neg_Initial, aes(x = Condition, fill = as.factor(Answer))) +
     axis.text.x = element_text(angle = 45, hjust = 1),
     plot.title = element_text(hjust = 0.5)
   )
+dev.off()
 
 #Pos_Final Graph of Choices
+png("C:/Users/magda/moje/LTE/psycholinguistics/emoji_analysis/plots/eng_pos_final.png", width=700)
 ggplot(Pos_Final, aes(x = Condition, fill = as.factor(Answer))) +
   geom_bar(position = "dodge", color = "black", width = 0.6) +
   scale_fill_manual(values = c("Subject" = "red", "Object" = "skyblue", "Sender" = "green")) +
@@ -119,8 +126,10 @@ ggplot(Pos_Final, aes(x = Condition, fill = as.factor(Answer))) +
     axis.text.x = element_text(angle = 45, hjust = 1),
     plot.title = element_text(hjust = 0.5)
   )
+dev.off()
 
 #Neg_Final Graph of Choices
+png("C:/Users/magda/moje/LTE/psycholinguistics/emoji_analysis/plots/eng_neg_final.png", width=700)
 ggplot(Neg_Final, aes(x = Condition, fill = as.factor(Answer))) +
   geom_bar(position = "dodge", color = "black", width = 0.6) +
   scale_fill_manual(values = c("Subject" = "red", "Object" = "skyblue", "Sender" = "green")) +
@@ -135,6 +144,18 @@ ggplot(Neg_Final, aes(x = Condition, fill = as.factor(Answer))) +
     axis.text.x = element_text(angle = 45, hjust = 1),
     plot.title = element_text(hjust = 0.5)
   )
+dev.off()
+
+# my plot :)
+ggplot(Emoj_EN %>% group_by(Condition), 
+       aes(x = Condition, 
+           fill = factor(Answer, levels = c("Subject", "Object", "Sender")))) +
+  geom_bar(position = "dodge", color = "black", width = 0.6) +
+  labs(
+    x = "Conditions",
+    y = "Count",  # Reflects counts of values
+    fill = "Answer"
+  ) + theme_minimal()
 
 #We will try some models
 

@@ -14,6 +14,10 @@ Emoj_PolBio <- read.csv("Emoji_Pol_Bio.csv", header=TRUE, sep=",")
 #Combine Datasets
 Emoj_Pol <- left_join(Emoj_Pol, Emoj_PolBio, by = "ID")
 
+#MINE
+# removing fillers?
+Emoj_Pol %>% filter(Condition != "Filler") -> Emoj_Pol
+
 #See what the top 5 rows of your dataset look like
 head(Emoj_Pol)
 
@@ -51,6 +55,7 @@ Pos_FinalP = subset(Emoj_Pol, Emoj_Pol$Condition %in% c("Pos_Final"))
 Neg_FinalP = subset(Emoj_Pol, Emoj_Pol$Condition %in% c("Neg_Final"))
 
 #Plot your data - proportions of answers given per condition
+png("C:/Users/magda/moje/LTE/psycholinguistics/emoji_analysis/plots/pol_distribution.png", width=700)
 ggplot(Emoj_Pol, aes(x = Condition, fill = Answer)) +
   geom_bar(position = "fill", color = "black") +
   scale_y_continuous(labels = scales::percent) +  # Convert y-axis to percentages
@@ -61,9 +66,11 @@ ggplot(Emoj_Pol, aes(x = Condition, fill = Answer)) +
     title = "Proportional Distribution of Answers by Condition"
   ) +
   theme_minimal()
+dev.off()
 
 
 #Pos_Initial Graph of Choices
+png("C:/Users/magda/moje/LTE/psycholinguistics/emoji_analysis/plots/pol_pos_initial.png", width=700)
 ggplot(Pos_InitialP, aes(x = Condition, fill = as.factor(Answer))) +
   geom_bar(position = "dodge", color = "black", width = 0.6) +
   scale_fill_manual(values = c("Subject" = "red", "Object" = "skyblue", "Sender" = "green")) +
@@ -78,8 +85,10 @@ ggplot(Pos_InitialP, aes(x = Condition, fill = as.factor(Answer))) +
     axis.text.x = element_text(angle = 45, hjust = 1),
     plot.title = element_text(hjust = 0.5)
   )
+dev.off()
 
 #Neg_Initial Graph of Choices
+png("C:/Users/magda/moje/LTE/psycholinguistics/emoji_analysis/plots/pol_neg_initial.png", width=700)
 ggplot(Neg_InitialP, aes(x = Condition, fill = as.factor(Answer))) +
   geom_bar(position = "dodge", color = "black", width = 0.6) +
   scale_fill_manual(values = c("Subject" = "red", "Object" = "skyblue", "Sender" = "green")) +
@@ -94,8 +103,10 @@ ggplot(Neg_InitialP, aes(x = Condition, fill = as.factor(Answer))) +
     axis.text.x = element_text(angle = 45, hjust = 1),
     plot.title = element_text(hjust = 0.5)
   )
+dev.off()
 
 #Pos_Final Graph of Choices
+png("C:/Users/magda/moje/LTE/psycholinguistics/emoji_analysis/plots/pol_pos_final.png", width=700)
 ggplot(Pos_FinalP, aes(x = Condition, fill = as.factor(Answer))) +
   geom_bar(position = "dodge", color = "black", width = 0.6) +
   scale_fill_manual(values = c("Subject" = "red", "Object" = "skyblue", "Sender" = "green")) +
@@ -110,8 +121,10 @@ ggplot(Pos_FinalP, aes(x = Condition, fill = as.factor(Answer))) +
     axis.text.x = element_text(angle = 45, hjust = 1),
     plot.title = element_text(hjust = 0.5)
   )
+dev.off()
 
 #Neg_Final Graph of Choices
+png("C:/Users/magda/moje/LTE/psycholinguistics/emoji_analysis/plots/pol_neg_final.png", width=700)
 ggplot(Neg_FinalP, aes(x = Condition, fill = as.factor(Answer))) +
   geom_bar(position = "dodge", color = "black", width = 0.6) +
   scale_fill_manual(values = c("Subject" = "red", "Object" = "skyblue", "Sender" = "green")) +
@@ -126,6 +139,18 @@ ggplot(Neg_FinalP, aes(x = Condition, fill = as.factor(Answer))) +
     axis.text.x = element_text(angle = 45, hjust = 1),
     plot.title = element_text(hjust = 0.5)
   )
+dev.off()
+
+# my plot :)
+ggplot(Emoj_Pol %>% group_by(Condition), 
+       aes(x = Condition, 
+           fill = factor(Answer, levels = c("Subject", "Object", "Sender")))) +
+  geom_bar(position = "dodge", color = "black", width = 0.6) +
+  labs(
+    x = "Conditions",
+    y = "Count",  # Reflects counts of values
+    fill = "Answer"
+  ) + theme_minimal()
 
 #First create binary factors for given answers
 Emoj_Pol$Object = ifelse(Emoj_Pol$Answer == "Object", 1, 0)
